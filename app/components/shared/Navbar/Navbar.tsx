@@ -1,12 +1,24 @@
 'use client';
 
+import { useCart } from '@/app/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { FaMoon, FaShoppingCart, FaSun } from 'react-icons/fa';
-import { useCart } from '@/app/context/CartContext';
 
 export default function Navbar() {
   const { cartCount, cartTotal } = useCart();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   const links = (
     <>
       <li>
@@ -62,27 +74,34 @@ export default function Navbar() {
             className="menu menu-md dropdown-content mt-3 z-50 p-3 shadow-xl bg-base-100 rounded-box w-64 border border-base-200"
           >
             <li className="mb-4">
-              <div className="relative w-full p-0">
+              <form onSubmit={handleSearch} className="relative w-full p-0">
                 <input
                   type="text"
                   placeholder="Search..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="input input-sm input-bordered w-full rounded-full pl-4 pr-10"
                 />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-primary cursor-pointer border-none bg-transparent p-0"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </form>
             </li>
             <li>
               <a>Home</a>
@@ -123,27 +142,34 @@ export default function Navbar() {
       <div className="navbar-end gap-1 md:gap-2">
         {/* Search Bar - Hidden on small screens */}
         <div className="hidden md:block form-control">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <input
               type="text"
               placeholder="Search products..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
               className="input input-sm input-bordered w-full md:w-48 lg:w-64 rounded-full pl-4 pr-10"
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-primary cursor-pointer border-none bg-transparent p-0"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </form>
         </div>
 
         {/* Theme Toggle */}
