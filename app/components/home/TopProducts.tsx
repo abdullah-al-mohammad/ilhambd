@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
-import Link from 'next/link';
 import { useCart } from '@/app/context/CartContext';
-import { TbHeart, TbPlus, TbStarFilled } from 'react-icons/tb';
 import { useFetch } from '@/hooks/useFetch';
+import Link from 'next/link';
+import { useMemo } from 'react';
+import { TbHeart, TbPlus, TbStarFilled } from 'react-icons/tb';
 
 type TopProduct = {
   id: string | number;
@@ -25,24 +25,24 @@ type ApiProduct = {
 };
 
 export default function TopProducts() {
-  const { data, loading, error } = useFetch<ApiProduct[]>('/api/products');
+  const { data, loading, error } = useFetch<ApiProduct[]>('/api/products/best-selling');
   const { addToCart } = useCart();
 
   const productsToRender = useMemo(() => {
     if (!data) return [];
 
     return data.slice(0, 6).map((product, index) => ({
-        id: product._id,
-        name: product.name,
-        salePrice: product.price,
-        originalPrice: Math.round(product.price * 1.2),
-        rating: 5,
-        badge: index < 2 ? 'New' : 'Sale',
-        badgeColor: index < 2 ? 'badge-success' : 'badge-warning',
-        image:
-          product.images?.[0] ||
-          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
-      }));
+      id: product._id,
+      name: product.name,
+      salePrice: product.price,
+      originalPrice: Math.round(product.price * 1.2),
+      rating: 5,
+      badge: index < 2 ? 'New' : 'Sale',
+      badgeColor: index < 2 ? 'badge-success' : 'badge-warning',
+      image:
+        product.images?.[0] ||
+        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
+    }));
   }, [data]);
 
   const handleAddToCart = (product: TopProduct) => {
@@ -60,7 +60,7 @@ export default function TopProducts() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h6 className="font-bold text-lg">Top Products</h6>
-          <Link href="/shop" className="btn btn-sm btn-ghost">
+          <Link href="/shop?filter=best-selling" className="btn btn-sm btn-ghost">
             View all
           </Link>
         </div>
@@ -78,15 +78,21 @@ export default function TopProducts() {
                   <TbHeart className="w-4 h-4" />
                 </button>
 
-                <figure className="relative h-36 mb-2 overflow-hidden rounded-md">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                  />
-                </figure>
+                <Link href={`/shop/${product.id}`}>
+                  <figure className="relative h-36 mb-2 overflow-hidden rounded-md">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </figure>
+                </Link>
 
-                <h6 className="font-bold text-sm truncate">{product.name}</h6>
+                <Link href={`/shop/${product.id}`}>
+                  <h6 className="font-bold text-sm truncate hover:text-primary transition-colors">
+                    {product.name}
+                  </h6>
+                </Link>
                 <p className="text-primary font-bold text-sm">
                   ${product.salePrice}{' '}
                   <span className="text-base-content/50 line-through text-xs ml-1">
@@ -103,7 +109,7 @@ export default function TopProducts() {
                   ))}
                 </div>
 
-                <button 
+                <button
                   className="btn btn-sm btn-primary w-full gap-2"
                   onClick={() => handleAddToCart(product)}
                 >
