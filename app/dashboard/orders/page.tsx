@@ -1,6 +1,5 @@
 'use client';
 import { useFetch } from '@/hooks/useFetch';
-import { useState } from 'react';
 import axiosInstance from '@/lib/axios';
 
 export default function OrdersDashboard() {
@@ -43,9 +42,19 @@ export default function OrdersDashboard() {
               orders.map(order => (
                 <tr key={order._id}>
                   <td className="font-mono text-xs">{order._id}</td>
-                  <td>
+                  <td className="relative group">
                     <div className="font-bold">{order.customerName}</div>
                     <div className="text-sm opacity-50">{order.customerEmail}</div>
+
+                    {/* Hover Box */}
+                    <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-base-200 text-sm p-3 rounded-lg shadow-lg z-50 w-56">
+                      <p>
+                        <b>Address:</b> {order.customerAddress}
+                      </p>
+                      <p>
+                        <b>Phone:</b> {order.customerPhone}
+                      </p>
+                    </div>
                   </td>
                   <td>${order.totalAmount}</td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
