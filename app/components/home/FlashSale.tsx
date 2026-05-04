@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { TbBolt } from 'react-icons/tb';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useFetch } from '@/hooks/useFetch';
@@ -86,23 +87,18 @@ export default function FlashSale({ endTime }: FlashSaleProps = {}) {
             <TbBolt className="mr-2 text-error animate-pulse" />
             Cyclone Offer
           </h6>
-          {/* Countdown timer */}
-          <div className="flex items-center gap-1 text-sm font-semibold text-error bg-error/10 px-3 py-1 rounded-full">
-            <span>
-              <span className="days">{days}</span>d
-            </span>
-            <span className="opacity-50">:</span>
-            <span>
-              <span className="hours">{hours}</span>h
-            </span>
-            <span className="opacity-50">:</span>
-            <span>
-              <span className="minutes">{minutes}</span>m
-            </span>
-            <span className="opacity-50">:</span>
-            <span>
-              <span className="seconds">{seconds}</span>s
-            </span>
+          <div className="flex items-center gap-3">
+            {/* Countdown timer */}
+            <div className="flex items-center gap-1 text-sm font-semibold text-error bg-error/10 px-3 py-1 rounded-full">
+              <span><span className="days">{days}</span>d</span>
+              <span className="opacity-50">:</span>
+              <span><span className="hours">{hours}</span>h</span>
+              <span className="opacity-50">:</span>
+              <span><span className="minutes">{minutes}</span>m</span>
+              <span className="opacity-50">:</span>
+              <span><span className="seconds">{seconds}</span>s</span>
+            </div>
+            <Link href="/shop" className="btn btn-sm btn-ghost">View all</Link>
           </div>
         </div>
 
@@ -126,7 +122,7 @@ export default function FlashSale({ endTime }: FlashSaleProps = {}) {
         >
           {displayProducts.map(product => (
             <SwiperSlide key={product.id} className="!w-48 sm:!w-56">
-              <div className="card w-full h-full bg-warning-content/5 border border-warning/20 shadow-sm">
+              <Link href={`/shop/${product.id}`} className="card w-full h-full bg-warning-content/5 border border-warning/20 shadow-sm hover:border-primary hover:shadow-md transition-all block">
                 <figure className="p-4 pb-0 h-32 relative">
                   <img
                     src={product.image}
@@ -155,7 +151,7 @@ export default function FlashSale({ endTime }: FlashSaleProps = {}) {
                     ></progress>
                   </div>
                 </div>
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
