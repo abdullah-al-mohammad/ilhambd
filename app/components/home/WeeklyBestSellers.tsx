@@ -111,16 +111,15 @@ export default function WeeklyBestSellers() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h6 className="font-bold text-lg">Weekly Best Sellers</h6>
-          <Link href="/shop-list" className="btn btn-sm btn-ghost">
-            View all
-          </Link>
+          <Link href="/shop" className="btn btn-sm btn-ghost">View all</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {productsToRender.map(product => (
-            <div
+            <Link
               key={product.id}
-              className="card card-side bg-base-100 shadow-sm border border-base-200 items-center overflow-hidden"
+              href={`/shop/${product.id}`}
+              className="card card-side bg-base-100 shadow-sm border border-base-200 items-center overflow-hidden hover:border-primary hover:shadow-md transition-all"
             >
               <div className="relative w-28 h-28 shrink-0 flex items-center justify-center bg-base-200/50 p-2">
                 <img
@@ -146,7 +145,7 @@ export default function WeeklyBestSellers() {
                   <span className="text-base-content/50 ml-1">({product.reviews} review)</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         {!isLoading && hasError ? (
