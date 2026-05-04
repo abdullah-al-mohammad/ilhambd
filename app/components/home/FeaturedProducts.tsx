@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { TbStarFilled } from 'react-icons/tb';
 import { useFetch } from '@/hooks/useFetch';
 
@@ -43,12 +44,12 @@ export default function FeaturedProducts() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h6 className="font-bold text-lg">Featured Products</h6>
-          <a href="/featured-products" className="btn btn-sm btn-ghost">View all</a>
+          <Link href="/shop?featured=true" className="btn btn-sm btn-ghost">View all</Link>
         </div>
         
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 sm:gap-4">
           {productsToRender.map(product => (
-            <div key={product.id} className="card bg-base-100 shadow-sm border border-base-200 p-2 sm:p-3 relative group">
+            <Link key={product.id} href={`/shop/${product.id}`} className="card bg-base-100 shadow-sm border border-base-200 p-2 sm:p-3 relative group hover:border-primary hover:shadow-md transition-all">
               <span className="absolute top-2 left-2 z-10 text-warning bg-warning/10 p-1 rounded-full"><TbStarFilled className="w-3 h-3" /></span>
               <figure className="h-20 sm:h-28 mb-2 rounded overflow-hidden">
                 <img src={product.image} alt={product.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
@@ -57,7 +58,7 @@ export default function FeaturedProducts() {
               <p className="text-primary font-bold text-xs sm:text-sm text-center">
                 ${product.price} <span className="text-base-content/50 line-through text-[10px] sm:text-xs ml-1 block sm:inline">${product.originalPrice}</span>
               </p>
-            </div>
+            </Link>
           ))}
         </div>
         {loading ? <p className="text-xs text-base-content/70 mt-3">Loading featured products...</p> : null}
