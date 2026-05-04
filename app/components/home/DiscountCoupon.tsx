@@ -1,7 +1,34 @@
+'use client';
+
 import Link from 'next/link';
 import { FaArrowRight } from 'react-icons/fa';
+import { useFetch } from '@/hooks/useFetch';
+
+type Coupon = {
+  _id: string;
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
+  isActive: boolean;
+  expiresAt: string;
+};
 
 export default function DiscountCoupon() {
+  const { data, loading } = useFetch<Coupon[]>('/api/coupons');
+
+  // Pick the first active, non-expired coupon
+  const coupon = data?.find(
+    (c) => c.isActive && new Date(c.expiresAt) > new Date()
+  );
+
+  // Don't render anything if no active coupon or still loading
+  if (loading || !coupon) return null;
+
+  const discountLabel =
+    coupon.type === 'percent'
+      ? `Get ${coupon.value}% discount!`
+      : `Get $${coupon.value} off!`;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="card bg-gradient-to-r from-red-700 to-pink-500 text-white shadow-lg overflow-hidden relative">
@@ -24,15 +51,15 @@ export default function DiscountCoupon() {
             </svg>
           </div>
           <div>
-            <h5 className="text-xl sm:text-2xl font-bold mb-1">Get 20% discount!</h5>
+            <h5 className="text-xl sm:text-2xl font-bold mb-1">{discountLabel}</h5>
             <p className="text-sm sm:text-base opacity-90">
               To get discount, enter the
               <span className="px-2 py-0.5 bg-white text-primary rounded-md font-bold text-xs shadow-sm mx-1">
-                GET20
+                {coupon.code}
               </span>{' '}
               code on the checkout page.
             </p>
-            <Link href={'/'} className="btn btn-primary btn-sm my-5 rounded-2xl">
+            <Link href="/checkout" className="btn btn-primary btn-sm my-5 rounded-2xl">
               Grab This Offer <FaArrowRight />
             </Link>
           </div>
@@ -41,3 +68,4 @@ export default function DiscountCoupon() {
     </div>
   );
 }
+
