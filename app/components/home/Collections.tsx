@@ -1,4 +1,4 @@
-import React from 'react';
+import Link from 'next/link';
 
 const collections = [
   { id: 1, name: "Women", count: 9, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80" },
@@ -15,22 +15,27 @@ export default function Collections() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h6 className="font-bold text-lg">Collections</h6>
-          <a href="/collections" className="btn btn-sm btn-ghost">View all</a>
+          <Link href="/shop" className="btn btn-sm btn-ghost">View all</Link>
         </div>
-        
+
         <div className="carousel rounded-box gap-4 w-full snap-x">
           {collections.map(col => (
-            <div key={col.id} className="carousel-item w-32 sm:w-40 snap-center relative rounded-xl overflow-hidden group border border-base-200">
+            <Link
+              key={col.id}
+              href={`/shop?category=${col.name.toLowerCase()}`}
+              className="carousel-item w-32 sm:w-40 snap-center relative rounded-xl overflow-hidden group border border-base-200 hover:border-primary transition-all"
+            >
               <img src={col.image} alt={col.name} className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 p-3 text-white flex justify-between items-center">
                 <span className="font-bold text-sm sm:text-base">{col.name}</span>
                 <span className="badge badge-error badge-sm text-white font-bold">{col.count}</span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </div>
   );
 }
+
