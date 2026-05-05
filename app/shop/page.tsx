@@ -19,7 +19,14 @@ export default function ShopPage() {
   const searchParams = useSearchParams();
   const filter = searchParams.get('filter');
   // const { data, loading, error } = useFetch<ApiProduct[]>('/api/products');
-  const url = filter === 'best-selling' ? '/api/products/best-selling' : '/api/products';
+  // const url = filter === 'best-selling' ? '/api/products/best-selling' : '/api/products';
+  const url =
+    filter === 'best-selling'
+      ? '/api/products/best-selling'
+      : filter === 'weekly-selling'
+        ? '/api/products?weekly=true'
+        : '/api/products';
+
   const { data, loading, error } = useFetch<ApiProduct[]>(url);
   const { addToCart } = useCart();
   // const searchParams = useSearchParams();
@@ -71,7 +78,7 @@ export default function ShopPage() {
             <h1 className="text-3xl font-bold">
               {searchQuery ? (
                 <>
-                  Results for{' '}
+                  Results for
                   <span className="text-primary">&ldquo;{searchParams.get('q')}&rdquo;</span>
                 </>
               ) : (
