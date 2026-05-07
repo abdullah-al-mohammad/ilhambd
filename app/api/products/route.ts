@@ -38,10 +38,12 @@ export async function GET(req: Request) {
     const flashSaleActive = searchParams.get('flashSaleActive');
     const category = searchParams.get('category');
     const weekly = searchParams.get('weekly');
+    const cycloneActive = searchParams.get('cycloneActive');
 
     const query: Record<string, any> = {};
 
     if (featured === 'true') query.isFeatured = true;
+    if (cycloneActive === 'true') query.isCycloneOffer = true;
 
     if (flashSaleActive === 'true') {
       query.flashSaleEndsAt = { $gt: new Date() };
