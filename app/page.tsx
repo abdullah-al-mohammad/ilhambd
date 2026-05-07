@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import Collections from './components/home/Collections';
 import DiscountCoupon from './components/home/DiscountCoupon';
 import FeaturedProducts from './components/home/FeaturedProducts';
-import FlashSale from './components/home/FlashSale';
+import CycloneOffer from './components/home/CycloneOffer';
 import HeroSlider from './components/home/HeroSlider';
 import ProductCategories from './components/home/ProductCategories';
 import TopProducts from './components/home/TopProducts';
@@ -32,7 +32,7 @@ export default function Home() {
         <div>
           <HeroSlider />
           <ProductCategories />
-          <FlashSale />
+          <CycloneOffer />
           <TopProducts />
           <DiscountCoupon />
           <WeeklyBestSellers />
