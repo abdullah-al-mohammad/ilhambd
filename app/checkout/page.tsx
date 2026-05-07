@@ -4,16 +4,33 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/app/context/CartContext';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function CheckoutPage() {
-  const { cart, cartTotal, clearCart } = useCart();
+  const { cart, cartTotal, clearCart, removeFromCart, updateQuantity } = useCart();
   const router = useRouter();
+  
+  const { user, loading: authLoading } = useAuth(); // Assuming useAuth is available
   
   // Wait for cart to hydrate from localStorage
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted && !authLoading && !user) {
+      router.push('/register?redirect=/checkout');
+    }
+  }, [mounted, authLoading, user, router]);
+
+  useEffect(() => {
+    if (user) {
+      setCustomerName(user.name || '');
+      setCustomerEmail(user.email || '');
+      setCustomerPhone(user.phone || '');
+    }
+  }, [user]);
 
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -80,8 +97,9 @@ export default function CheckoutPage() {
     return discountInfo.value;
   };
 
+  const shippingPrice = 60; // Fixed shipping price
   const discountAmount = calculateDiscount();
-  const finalTotal = Math.max(0, orderAmount - discountAmount);
+  const finalTotal = Math.max(0, orderAmount + shippingPrice - discountAmount);
 
   const placeOrder = async () => {
     if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
@@ -111,6 +129,7 @@ export default function CheckoutPage() {
         customerAddress,
         items,
         subTotal: orderAmount,
+        shippingPrice,
         discountAmount: discountAmount,
         couponCode: discountInfo?.code,
         totalAmount: finalTotal,
@@ -163,11 +182,23 @@ export default function CheckoutPage() {
                           {item.image && <img src={item.image} alt={item.name} className="object-cover w-full h-full" />}
                         </div>
                         <div>
-                          <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-sm text-base-content/60">Quantity: {item.quantity}</p>
+                          <h3 className="font-semibold text-sm">{item.name}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
+                             <span className="text-xs font-bold">{item.quantity}</span>
+                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
+                          </div>
                         </div>
                       </div>
-                      <div className="font-semibold">${(item.price * item.quantity).toFixed(2)}</div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
+                        <button 
+                          className="btn btn-xs btn-ghost text-error hover:bg-error/10 uppercase font-bold text-[10px]"
+                          onClick={() => removeFromCart(item._id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -212,7 +243,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span>${shippingPrice.toFixed(2)}</span>
                   </div>
                   
                   {discountInfo && (
