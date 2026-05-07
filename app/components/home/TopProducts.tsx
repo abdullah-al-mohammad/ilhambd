@@ -26,7 +26,7 @@ type ApiProduct = {
 
 export default function TopProducts() {
   const { data, loading, error } = useFetch<ApiProduct[]>('/api/products/best-selling');
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
 
   const productsToRender = useMemo(() => {
     if (!data) return [];
@@ -34,8 +34,8 @@ export default function TopProducts() {
     return data.slice(0, 6).map((product, index) => ({
       id: product._id,
       name: product.name,
-      salePrice: product.price,
-      originalPrice: Math.round(product.price * 1.2),
+      salePrice: Number(product.price) || 0,
+      originalPrice: Math.round((Number(product.price) || 0) * 1.2),
       rating: 5,
       badge: index < 2 ? 'New' : 'Sale',
       badgeColor: index < 2 ? 'badge-success' : 'badge-warning',
@@ -110,10 +110,10 @@ export default function TopProducts() {
                 </div>
 
                 <button
-                  className="btn btn-sm btn-primary w-full gap-2"
+                  className={`btn btn-sm w-full gap-2 ${cart.some(c => c._id === String(product.id)) ? 'btn-outline border-primary text-primary' : 'btn-primary'}`}
                   onClick={() => handleAddToCart(product)}
                 >
-                  <TbPlus /> Add
+                  <TbPlus /> {cart.some(c => c._id === String(product.id)) ? 'In Cart' : 'Add'}
                 </button>
               </div>
             </div>
