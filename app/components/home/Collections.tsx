@@ -4,7 +4,7 @@ const collections = [
   { id: 1, name: "Women", count: 9, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80" },
   { id: 2, name: "Men", count: 29, image: "https://images.unsplash.com/photo-1490578474895-699bc4e3f444?w=400&q=80" },
   { id: 3, name: "Kids", count: 4, image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80" },
-  { id: 4, name: "Gadget", count: 11, image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80" },
+  { id: 4, name: "Electric", count: 11, image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80" },
   { id: 5, name: "Foods", count: 2, image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80" },
   { id: 6, name: "Sports", count: 5, image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&q=80" },
 ];
