@@ -1,14 +1,16 @@
 'use client';
 
+import { useAuth } from '@/app/context/AuthContext';
 import { useCart } from '@/app/context/CartContext';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FaMoon, FaShoppingCart, FaSun } from 'react-icons/fa';
+import { FaMoon, FaShoppingCart, FaSignOutAlt, FaSun, FaUser } from 'react-icons/fa';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { cartCount, cartTotal } = useCart();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,10 +24,15 @@ export default function Navbar() {
   const links = (
     <>
       <li>
-        <a>Home</a>
+        <Link href="/">Home</Link>
       </li>
+      {user?.role === 'admin' && (
+        <li>
+          <Link href="/dashboard" className="text-primary font-bold">Dashboard</Link>
+        </li>
+      )}
       <li>
-        <details open>
+        <details>
           <summary>Shop</summary>
           <ul className="mt-2 bg-base-200/50 rounded-lg">
             <li>
@@ -48,6 +55,7 @@ export default function Navbar() {
       </li>
     </>
   );
+
   return (
     <div className="navbar bg-base-200 lg:mb-10 shadow-sm w-full rounded-md sticky top-0 z-50 px-2 lg:px-4">
       <div className="navbar-start">
@@ -103,36 +111,12 @@ export default function Navbar() {
                 </button>
               </form>
             </li>
-            <li>
-              <a>Home</a>
-            </li>
-            <li>
-              <details open>
-                <summary>Shop</summary>
-                <ul className="mt-2 bg-base-200/50 rounded-lg">
-                  <li>
-                    <Link href="/shop">All Products</Link>
-                  </li>
-                  <li>
-                    <a>Men&apos;s Fashion</a>
-                  </li>
-                  <li>
-                    <a>Women&apos;s Fashion</a>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li>
-              <a>Best Deals</a>
-            </li>
-            <li>
-              <a>Contact Us</a>
-            </li>
+            {links}
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl font-bold tracking-tight px-1 collapse-title">
+        <Link href="/" className="text-xl font-bold pl-5">
           Ilham Group
-        </a>
+        </Link>
       </div>
 
       <div className="navbar-center hidden lg:flex">
@@ -140,7 +124,6 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-end gap-1 md:gap-2">
-        {/* Search Bar - Hidden on small screens */}
         <div className="hidden md:block form-control">
           <form onSubmit={handleSearch} className="relative">
             <input
@@ -172,17 +155,36 @@ export default function Navbar() {
           </form>
         </div>
 
-        {/* Theme Toggle */}
-        <label className="swap swap-rotate btn btn-ghost btn-circle">
-          {/* this hidden checkbox controls the state */}
-          <input type="checkbox" className="theme-controller" value="dark" />
+        {/* Theme Dropdown */}
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+            <FaSun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <FaMoon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </div>
+          <ul tabIndex={0} className="dropdown-content z-100 menu p-2 shadow-xl bg-base-100 rounded-box w-32 border border-base-200 mt-2">
+            <li>
+              <button onClick={() => {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+              }}>Light</button>
+            </li>
+            <li>
+              <button onClick={() => {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+              }}>Dark</button>
+            </li>
+            <li>
+              <button onClick={() => {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                localStorage.removeItem('theme');
+              }}>System</button>
+            </li>
+          </ul>
+        </div>
 
-          {/* sun icon */}
-          <FaSun className="swap-on text-xl" />
-
-          {/* moon icon */}
-          <FaMoon className="swap-off text-xl" />
-        </label>
+        <NotificationBell />
 
         {/* Cart Dropdown */}
         <div className="dropdown dropdown-end">
@@ -219,15 +221,49 @@ export default function Navbar() {
             role="button"
             className="btn btn-ghost btn-circle avatar border border-base-300"
           >
-            <div className="w-9 rounded-full">
-              <Image alt="User profile" src="" width={36} height={36} />
+            <div className="w-9 rounded-full flex items-center justify-center bg-base-300 overflow-hidden">
+              {user ? (
+                <span className="text-xs font-bold">{user.name.charAt(0).toUpperCase()}</span>
+              ) : (
+                <FaUser className="text-base-content/50" />
+              )}
             </div>
           </div>
           <ul
             tabIndex={0}
             className="menu menu-sm dropdown-content mt-3 z-100 p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-200"
           >
-            {links}
+            {user ? (
+              <>
+                <li className="menu-title px-4 py-2 border-b border-base-200 mb-2">
+                  <span className="font-bold block text-base-content">{user.name}</span>
+                  <span className="text-xs text-base-content/60 font-normal truncate">
+                    {user.email}
+                  </span>
+                </li>
+                {user.role === 'admin' && (
+                  <li>
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      Admin Panel
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <button onClick={logout} className="flex items-center gap-2 text-error">
+                    <FaSignOutAlt /> Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link href="/login">Login</Link>
+                </li>
+                <li>
+                  <Link href="/register">Register</Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

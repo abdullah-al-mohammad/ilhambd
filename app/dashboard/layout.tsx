@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TbBolt } from 'react-icons/tb';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,11 +31,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link href="/dashboard/orders">Manage Orders</Link>
           </li>
           <li>
+            <Link href="/dashboard/users">Manage Users</Link>
+          </li>
+          <li>
             <Link href="/dashboard/best-selling">Best Selling</Link>
           </li>
           <li>
             <Link href="/dashboard/coupons">Coupons</Link>
           </li>
+          <li>
+            <Link
+              href="/dashboard/cyclone-offer"
+              className="flex items-center gap-2 text-error font-semibold"
+            >
+              <TbBolt className="text-error animate-pulse" />
+              Cyclone Offer
+            </Link>
+          </li>
+
           <li>
             <Link href="/">Back to Store</Link>
           </li>

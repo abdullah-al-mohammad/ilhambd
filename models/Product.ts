@@ -15,6 +15,8 @@ export interface IProduct extends Document {
   discountPercent: number;
   flashSalePrice?: number;
   flashSaleEndsAt?: Date;
+  isCycloneOffer?: boolean;
+  cyclonePrice?: number;
   createdAt: Date;
 }
 
@@ -33,6 +35,8 @@ const ProductSchema: Schema<IProduct> = new Schema({
   discountPercent: { type: Number, min: 0, max: 100, default: 0 },
   flashSalePrice: { type: Number },
   flashSaleEndsAt: { type: Date },
+  isCycloneOffer: { type: Boolean, default: false },
+  cyclonePrice: { type: Number },
   createdAt: { type: Date, default: Date.now },
 });
 
