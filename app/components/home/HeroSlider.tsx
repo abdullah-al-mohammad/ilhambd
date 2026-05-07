@@ -1,14 +1,14 @@
 'use client';
 
+import { useFetch } from '@/hooks/useFetch';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import { useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
-import { useFetch } from '@/hooks/useFetch';
+import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 type Product = {
   _id: string;
@@ -27,7 +27,7 @@ function HeroSlide({ product, active }: { product: Product; active: number }) {
 
   return (
     <div
-      className="relative h-48 md:h-64 lg:h-80 bg-cover bg-center flex items-center"
+      className="relative h-48 md:h-64 lg:h-80 bg-cover bg-no-repeat bg-center flex items-center"
       style={{ backgroundImage: `url(${image})` }}
     >
       {/* overlay */}
@@ -69,10 +69,7 @@ function HeroSlide({ product, active }: { product: Product; active: number }) {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="flex items-center gap-3"
         >
-          <Link
-            href={`/shop`}
-            className="btn btn-primary btn-sm md:btn-md rounded-full px-6"
-          >
+          <Link href={`/shop`} className="btn btn-primary btn-sm md:btn-md rounded-full px-6">
             Buy Now
           </Link>
           <span className="badge badge-warning text-white font-bold text-sm px-3 py-3">
@@ -112,7 +109,7 @@ export default function HeroSlider() {
         pagination={{ clickable: true }}
         className="rounded-xl overflow-hidden mySwiper"
       >
-        {featuredProducts.map((product, index) => (
+        {featuredProducts.map(product => (
           <SwiperSlide key={product._id}>
             <HeroSlide product={product} active={activeIndex} />
           </SwiperSlide>
@@ -121,4 +118,3 @@ export default function HeroSlider() {
     </div>
   );
 }
-
