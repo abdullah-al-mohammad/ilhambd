@@ -40,7 +40,7 @@ export default function BestSellingDashboard() {
                   <td>#{index + 1}</td>
                   <td className="font-semibold">{item.productName}</td>
                   <td>{item.totalSold}</td>
-                  <td>${item.totalRevenue.toFixed(2)}</td>
+                  <td>${(item.totalRevenue || 0).toFixed(2)}</td>
                 </tr>
               ))
             )}

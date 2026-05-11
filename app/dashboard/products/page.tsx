@@ -19,6 +19,9 @@ type Product = {
   discountPercent?: number | string;
   flashSalePrice?: number | string;
   flashSaleEndsAt?: string;
+  colors?: string | string[];
+  sizes?: string | string[];
+  isDisabled?: boolean;
 };
 
 const emptyForm: Product = {
@@ -35,6 +38,9 @@ const emptyForm: Product = {
   discountPercent: '',
   flashSalePrice: '',
   flashSaleEndsAt: '',
+  colors: '',
+  sizes: '',
+  isDisabled: false,
 };
 
 // ---------------- FETCHER ----------------
@@ -42,7 +48,7 @@ const fetcher = (url: string) => axiosInstance.get(url).then(res => res.data);
 
 // ---------------- COMPONENT ----------------
 export default function ProductsDashboard() {
-  const { data, isLoading, mutate } = useSWR<Product[]>('/api/products', fetcher);
+  const { data, isLoading, mutate } = useSWR<Product[]>('/api/products?all=true', fetcher);
 
   const products = data || [];
 
@@ -68,6 +74,9 @@ export default function ProductsDashboard() {
     flashSalePrice: toOptionalNumber(product.flashSalePrice),
     flashSaleEndsAt: product.flashSaleEndsAt ? product.flashSaleEndsAt : undefined,
     isFeatured: Boolean(product.isFeatured),
+    isDisabled: Boolean(product.isDisabled),
+    colors: typeof product.colors === 'string' ? product.colors.split(',').map(s => s.trim()).filter(Boolean) : product.colors,
+    sizes: typeof product.sizes === 'string' ? product.sizes.split(',').map(s => s.trim()).filter(Boolean) : product.sizes,
   });
 
   const uploadToCloudinary = async (file: File) => {
@@ -193,6 +202,26 @@ export default function ProductsDashboard() {
     }
   };
 
+  const handleDisableToggle = async (id: string, checked: boolean) => {
+    setTogglingId(id);
+    await mutate(
+      current =>
+        (current || []).map(product =>
+          product._id === id ? { ...product, isDisabled: checked } : product
+        ),
+      false
+    );
+    try {
+      await axiosInstance.put(`/api/products/${id}`, { isDisabled: checked });
+      await mutate();
+    } catch (error) {
+      console.error('Disable toggle error:', error);
+      await mutate();
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   // ---------------- EDIT ----------------
   const openEditModal = (product: Product) => {
     setFormData({
@@ -211,6 +240,9 @@ export default function ProductsDashboard() {
       flashSaleEndsAt: product.flashSaleEndsAt
         ? new Date(product.flashSaleEndsAt).toISOString().slice(0, 16)
         : '',
+      colors: Array.isArray(product.colors) ? product.colors.join(', ') : '',
+      sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
+      isDisabled: product.isDisabled ?? false,
     });
 
     setEditingId(product._id || null);
@@ -252,6 +284,7 @@ export default function ProductsDashboard() {
               <th>Sold %</th>
               <th>Stock</th>
               <th>Featured</th>
+              <th>Disabled</th>
               <th>Discount</th>
               <th>Flash Sale</th>
               <th>Actions</th>
@@ -318,6 +351,16 @@ export default function ProductsDashboard() {
                       checked={Boolean(product.isFeatured)}
                       disabled={togglingId === product._id}
                       onChange={e => handleFeatureToggle(product._id!, e.currentTarget.checked)}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-sm toggle-error"
+                      checked={Boolean(product.isDisabled)}
+                      disabled={togglingId === product._id}
+                      onChange={e => handleDisableToggle(product._id!, e.currentTarget.checked)}
                     />
                   </td>
 
@@ -394,17 +437,32 @@ export default function ProductsDashboard() {
               />
             </div>
 
-            <div className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  name="isFeatured"
-                  checked={Boolean(formData.isFeatured)}
-                  onChange={handleChange}
-                  className="checkbox checkbox-primary"
-                />
-                <span className="label-text">Mark as featured product</span>
-              </label>
+            <div className="flex gap-4">
+              <div className="form-control">
+                <label className="label cursor-pointer justify-start gap-3">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={Boolean(formData.isFeatured)}
+                    onChange={handleChange}
+                    className="checkbox checkbox-primary"
+                  />
+                  <span className="label-text">Mark as featured product</span>
+                </label>
+              </div>
+
+              <div className="form-control">
+                <label className="label cursor-pointer justify-start gap-3">
+                  <input
+                    type="checkbox"
+                    name="isDisabled"
+                    checked={Boolean(formData.isDisabled)}
+                    onChange={handleChange}
+                    className="checkbox checkbox-error"
+                  />
+                  <span className="label-text">Disable product</span>
+                </label>
+              </div>
             </div>
 
             <div className="flex gap-2">
@@ -466,6 +524,24 @@ export default function ProductsDashboard() {
               placeholder="Subcategory"
               className="input input-bordered"
             />
+
+            <div className="flex gap-2">
+              <input
+                name="colors"
+                value={formData.colors as string}
+                onChange={handleChange}
+                placeholder="Colors (comma separated: Red, Blue, Green)"
+                className="input input-bordered w-full"
+              />
+
+              <input
+                name="sizes"
+                value={formData.sizes as string}
+                onChange={handleChange}
+                placeholder="Sizes (comma separated: S, M, L, XL)"
+                className="input input-bordered w-full"
+              />
+            </div>
 
             <input
               type="file"

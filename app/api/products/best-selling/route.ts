@@ -18,6 +18,32 @@ export async function GET() {
       },
       { $sort: { totalSold: -1 } },
       { $limit: 10 },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'productDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$productDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          totalSold: 1,
+          totalRevenue: 1,
+          price: { $ifNull: ['$productDetails.price', 0] },
+          image: '$productDetails.image',
+          images: '$productDetails.images',
+          category: '$productDetails.category',
+        },
+      },
     ]);
 
     return NextResponse.json(bestSelling);

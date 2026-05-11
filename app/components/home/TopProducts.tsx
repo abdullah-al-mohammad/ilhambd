@@ -40,6 +40,7 @@ export default function TopProducts() {
       badge: index < 2 ? 'New' : 'Sale',
       badgeColor: index < 2 ? 'badge-success' : 'badge-warning',
       image:
+        (product as any).image ||
         product.images?.[0] ||
         'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
     }));

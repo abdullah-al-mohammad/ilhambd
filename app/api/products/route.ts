@@ -39,8 +39,13 @@ export async function GET(req: Request) {
     const category = searchParams.get('category');
     const weekly = searchParams.get('weekly');
     const cycloneActive = searchParams.get('cycloneActive');
+    const all = searchParams.get('all');
 
     const query: Record<string, any> = {};
+
+    if (all !== 'true') {
+      query.isDisabled = { $ne: true };
+    }
 
     if (featured === 'true') query.isFeatured = true;
     if (cycloneActive === 'true') query.isCycloneOffer = true;
@@ -56,20 +61,19 @@ export async function GET(req: Request) {
     }
 
     if (weekly === 'true') {
-      const lastWeek = new Date();
-      lastWeek.setDate(lastWeek.getDate() - 7);
-      query.createdAt = { $gte: lastWeek };
+      // Instead of limiting to products created in the last 7 days, 
+      // we sort by soldPercentage which the admin can control.
     }
 
     let sortOption: any = { createdAt: -1 };
 
     if (weekly === 'true') {
-      sortOption = { salesCount: -1 }; // best sellers first
+      sortOption = { soldPercentage: -1 }; // best sellers first
     }
 
     const products = await Product.find(query)
       .sort(sortOption)
-      .limit(weekly === 'true' ? 6 : 50); // limit only for weekly
+      .limit(weekly === 'true' ? 6 : 0); // 0 means no limit
 
     return NextResponse.json(products);
   } catch (error: any) {

@@ -3,22 +3,34 @@ import User from '@/models/User';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
   try {
     await dbConnect();
-    const { credential } = await req.json();
+    const body = await req.json();
+    const { credential } = body;
+
+    if (!credential) {
+      return NextResponse.json({ message: 'Google credential is required' }, { status: 400 });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.error('GOOGLE_CLIENT_ID is missing in environment variables');
+      return NextResponse.json({ message: 'Internal Server Error: Missing Google Client ID' }, { status: 500 });
+    }
+
+    const client = new OAuth2Client(clientId);
 
     const ticket = await client.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: clientId,
     });
 
     const payload = ticket.getPayload();
     if (!payload) {
-      return NextResponse.json({ message: 'Invalid token' }, { status: 400 });
+      return NextResponse.json({ message: 'Invalid Google token' }, { status: 400 });
     }
 
     const { sub: googleId, email, name, picture } = payload;
@@ -42,7 +54,7 @@ export async function POST(req: Request) {
     // ✅ JWT TOKEN
     const token = jwt.sign(
       {
-        id: user._id,
+        id: user._id.toString(),
         role: user.role,
       },
       process.env.JWT_SECRET!,
@@ -60,17 +72,22 @@ export async function POST(req: Request) {
       },
     });
 
-    // ✅ Secure cookie
-    res.cookies.set('token', token, {
+    // ✅ Set cookie using headers for better compatibility with Next.js 15/16
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return res;
   } catch (error: any) {
-    console.error('Google Auth Error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error('Google Auth Error:', error.message || error);
+    return NextResponse.json({ 
+      message: 'Authentication failed', 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+    }, { status: 500 });
   }
 }

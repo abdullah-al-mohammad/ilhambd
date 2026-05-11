@@ -25,6 +25,7 @@ export default function OrdersDashboard() {
             <tr>
               <th>Order ID</th>
               <th>Customer</th>
+              <th>Items</th>
               <th>Total Amount</th>
               <th>Date</th>
               <th>Status</th>
@@ -54,6 +55,29 @@ export default function OrdersDashboard() {
                       <p>
                         <b>Phone:</b> {order.customerPhone}
                       </p>
+                    </div>
+                  </td>
+                  <td className="relative group/items">
+                    <div className="badge badge-ghost cursor-help">{order.items?.length || 0} items</div>
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover/items:block bg-base-200 text-sm p-3 rounded-lg shadow-xl z-50 w-72 border border-base-300">
+                      <h4 className="font-bold mb-2 pb-1 border-b border-base-300">Order Details</h4>
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        {order.items?.map((item: any, idx: number) => (
+                          <div key={idx} className="flex justify-between items-start text-xs border-b border-base-300 pb-2 last:border-0 last:pb-0">
+                            <div className="flex flex-col pr-2">
+                              <span className="font-medium">{item.name}</span>
+                              {(item.color || item.size) && (
+                                <span className="opacity-60 text-[10px]">
+                                  {item.color && `Color: ${item.color}`}
+                                  {item.color && item.size && ' | '}
+                                  {item.size && `Size: ${item.size}`}
+                                </span>
+                              )}
+                            </div>
+                            <span className="whitespace-nowrap opacity-80 mt-0.5">{item.quantity} x ${item.price}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </td>
                   <td>${order.totalAmount}</td>

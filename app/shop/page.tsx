@@ -11,6 +11,7 @@ type ApiProduct = {
   _id: string;
   name: string;
   price: number;
+  image?: string;
   images?: string[];
   category: string;
 };
@@ -35,18 +36,25 @@ export default function ShopPage() {
   const productsToRender = useMemo(() => {
     if (!data) return [];
 
-    const mapped = data.map(product => ({
-      id: product._id,
-      name: product.name,
-      salePrice: product.price,
-      originalPrice: Math.round(product.price * 1.2),
-      rating: 5,
-      badge: 'Sale',
-      badgeColor: 'badge-warning',
-      image:
-        product.images?.[0] ||
-        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
-    }));
+    const mapped = data.map(product => {
+      // Handle the case where the API returns best-selling data format
+      const productName = product.name || (product as any).productName || 'Unknown Product';
+      const productPrice = product.price || 0;
+      
+      return {
+        id: product._id,
+        name: productName,
+        salePrice: productPrice,
+        originalPrice: Math.round(productPrice * 1.2),
+        rating: 5,
+        badge: 'Sale',
+        badgeColor: 'badge-warning',
+        image:
+          product.image ||
+          product.images?.[0] ||
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80',
+      };
+    });
 
     if (!searchQuery) return mapped;
     return mapped.filter(p => p.name.toLowerCase().includes(searchQuery));

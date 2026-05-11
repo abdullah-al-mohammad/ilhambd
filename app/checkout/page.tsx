@@ -120,6 +120,8 @@ export default function CheckoutPage() {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
+        color: item.selectedColor,
+        size: item.selectedSize,
       }));
 
       const payload = {
@@ -175,18 +177,25 @@ export default function CheckoutPage() {
                 {cart.length === 0 ? (
                   <p className="text-base-content/70 text-sm">Your cart is empty.</p>
                 ) : (
-                  cart.map(item => (
-                    <div key={item._id} className="flex justify-between items-center border-b border-base-200 py-4 last:border-b-0">
+                  cart.map((item, index) => (
+                    <div key={`${item._id}-${item.selectedColor}-${item.selectedSize}-${index}`} className="flex justify-between items-center border-b border-base-200 py-4 last:border-b-0">
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-base-300 rounded-md overflow-hidden relative">
                           {item.image && <img src={item.image} alt={item.name} className="object-cover w-full h-full" />}
                         </div>
                         <div>
                           <h3 className="font-semibold text-sm">{item.name}</h3>
+                          {(item.selectedColor || item.selectedSize) && (
+                            <p className="text-[10px] opacity-60">
+                              {item.selectedColor && `Color: ${item.selectedColor}`}
+                              {item.selectedColor && item.selectedSize && ' | '}
+                              {item.selectedSize && `Size: ${item.selectedSize}`}
+                            </p>
+                          )}
                           <div className="flex items-center gap-2 mt-1">
-                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
+                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity - 1, item.selectedColor, item.selectedSize)}>-</button>
                              <span className="text-xs font-bold">{item.quantity}</span>
-                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
+                             <button className="btn btn-xs btn-circle btn-outline" onClick={() => updateQuantity(item._id, item.quantity + 1, item.selectedColor, item.selectedSize)}>+</button>
                           </div>
                         </div>
                       </div>
@@ -194,7 +203,7 @@ export default function CheckoutPage() {
                         <div className="font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
                         <button 
                           className="btn btn-xs btn-ghost text-error hover:bg-error/10 uppercase font-bold text-[10px]"
-                          onClick={() => removeFromCart(item._id)}
+                          onClick={() => removeFromCart(item._id, item.selectedColor, item.selectedSize)}
                         >
                           Remove
                         </button>

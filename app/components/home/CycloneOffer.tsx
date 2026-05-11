@@ -46,7 +46,8 @@ export default function CycloneOffer() {
   }, [settings]);
 
   if (!settings?.isActive) return null;
-  if (!loading && (!products || products.length === 0)) return null;
+  if (loading) return null;
+  if (!products || products.length === 0) return null;
 
   const formatTime = (t: number) => {
     const h = Math.floor(t / 3600);

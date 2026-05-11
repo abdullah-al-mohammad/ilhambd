@@ -19,6 +19,8 @@ type Product = {
   stock?: number;
   images?: string[];
   image?: string;
+  colors?: string[];
+  sizes?: string[];
 };
 
 export default function ProductDetailPage() {
@@ -27,6 +29,9 @@ export default function ProductDetailPage() {
   const { addToCart } = useCart();
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   if (loading) {
     return (
@@ -55,12 +60,24 @@ export default function ProductDetailPage() {
         ];
 
   const handleAddToCart = () => {
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      setErrorMsg('Please select a color.');
+      return;
+    }
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      setErrorMsg('Please select a size.');
+      return;
+    }
+    
+    setErrorMsg('');
     addToCart({
       _id: product._id,
       name: product.name,
       price: product.price,
       image: images[0],
       quantity: qty,
+      selectedColor: selectedColor || undefined,
+      selectedSize: selectedSize || undefined,
     });
   };
 
@@ -173,6 +190,47 @@ export default function ProductDetailPage() {
             )}
 
             <div className="divider" />
+
+            {/* Variations: Colors & Sizes */}
+            {((product.colors && product.colors.length > 0) || (product.sizes && product.sizes.length > 0)) && (
+              <div className="flex flex-col gap-4">
+                {product.colors && product.colors.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-sm mb-2 block">Color</span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.colors.map(color => (
+                        <button
+                          key={color}
+                          onClick={() => { setSelectedColor(color); setErrorMsg(''); }}
+                          className={`btn btn-sm ${selectedColor === color ? 'btn-primary' : 'btn-outline'}`}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {product.sizes && product.sizes.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-sm mb-2 block">Size</span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map(size => (
+                        <button
+                          key={size}
+                          onClick={() => { setSelectedSize(size); setErrorMsg(''); }}
+                          className={`btn btn-sm ${selectedSize === size ? 'btn-primary' : 'btn-outline'}`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {errorMsg && <p className="text-error text-sm">{errorMsg}</p>}
 
             {/* Qty + Add to Cart */}
             <div className="flex items-center gap-3 flex-wrap">

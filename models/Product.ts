@@ -17,6 +17,9 @@ export interface IProduct extends Document {
   flashSaleEndsAt?: Date;
   isCycloneOffer?: boolean;
   cyclonePrice?: number;
+  colors: string[];
+  sizes: string[];
+  isDisabled?: boolean;
   createdAt: Date;
 }
 
@@ -37,6 +40,9 @@ const ProductSchema: Schema<IProduct> = new Schema({
   flashSaleEndsAt: { type: Date },
   isCycloneOffer: { type: Boolean, default: false },
   cyclonePrice: { type: Number },
+  colors: [{ type: String }],
+  sizes: [{ type: String }],
+  isDisabled: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
