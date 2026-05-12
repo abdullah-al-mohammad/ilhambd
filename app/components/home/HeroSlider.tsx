@@ -27,7 +27,7 @@ function HeroSlide({ product, active }: { product: Product; active: number }) {
 
   return (
     <div
-      className="relative h-48 md:h-64 lg:h-80 bg-cover bg-no-repeat bg-center flex items-center"
+      className="relative h-48 md:h-64 lg:h-[500px] bg-cover bg-no-repeat bg-center flex items-center"
       style={{ backgroundImage: `url(${image})` }}
     >
       {/* overlay */}
