@@ -1,16 +1,13 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
-    const { role } = await req.json();
+    const { id } = await context.params;
+    const { role } = await request.json();
 
     if (!role || !['user', 'admin'].includes(role)) {
       return NextResponse.json({ message: 'Invalid role' }, { status: 400 });
