@@ -1,6 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import Coupon from '@/models/Coupon';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -12,7 +12,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();

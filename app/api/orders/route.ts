@@ -1,6 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import Order from '@/models/Order';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -14,14 +14,17 @@ export async function GET() {
 
 import Coupon from '@/models/Coupon';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
-    
+
     // If a coupon code was provided, validate and increment usedCount
     if (body.couponCode) {
-      const coupon = await Coupon.findOne({ code: String(body.couponCode).toUpperCase(), isActive: true });
+      const coupon = await Coupon.findOne({
+        code: String(body.couponCode).toUpperCase(),
+        isActive: true,
+      });
       if (coupon) {
         coupon.usedCount += 1;
         await coupon.save();

@@ -2,10 +2,10 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
@@ -18,7 +18,10 @@ export async function POST(req: Request) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     if (!clientId) {
       console.error('GOOGLE_CLIENT_ID is missing in environment variables');
-      return NextResponse.json({ message: 'Internal Server Error: Missing Google Client ID' }, { status: 500 });
+      return NextResponse.json(
+        { message: 'Internal Server Error: Missing Google Client ID' },
+        { status: 500 }
+      );
     }
 
     const client = new OAuth2Client(clientId);
@@ -85,9 +88,12 @@ export async function POST(req: Request) {
     return res;
   } catch (error: any) {
     console.error('Google Auth Error:', error.message || error);
-    return NextResponse.json({ 
-      message: 'Authentication failed', 
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        message: 'Authentication failed',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      },
+      { status: 500 }
+    );
   }
 }

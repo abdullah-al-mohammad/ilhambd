@@ -2,17 +2,20 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
     const { identifier, password } = await req.json();
 
     if (!identifier || !password) {
-      return NextResponse.json({ message: 'Email/Phone and Password are required' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'Email/Phone and Password are required' },
+        { status: 400 }
+      );
     }
 
     const user = await User.findOne({
@@ -25,9 +28,13 @@ export async function POST(req: Request) {
 
     // 🚩 Check if user has a password. If not (Google-only), suggest using Google login.
     if (!user.password) {
-      return NextResponse.json({ 
-        message: 'This account was created with Google. Please use the "Sign in with Google" button.' 
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          message:
+            'This account was created with Google. Please use the "Sign in with Google" button.',
+        },
+        { status: 401 }
+      );
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

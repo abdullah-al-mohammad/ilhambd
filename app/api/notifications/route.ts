@@ -1,8 +1,8 @@
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Notification from '@/models/Notification';
+import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -28,11 +28,14 @@ export async function GET() {
     return NextResponse.json(notifications, { status: 200 });
   } catch (error: any) {
     console.error('GET Notifications Error:', error);
-    return NextResponse.json({ message: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -49,7 +52,7 @@ export async function PATCH(req: Request) {
     }
 
     await dbConnect();
-    
+
     // Mark all as read
     await Notification.updateMany(
       { userId: decoded.id, isRead: false },
@@ -59,6 +62,9 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: 'Notifications marked as read' }, { status: 200 });
   } catch (error: any) {
     console.error('PATCH Notifications Error:', error);
-    return NextResponse.json({ message: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }

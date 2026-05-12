@@ -1,8 +1,8 @@
 import dbConnect from '@/lib/mongodb';
 import Coupon from '@/models/Coupon';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
@@ -31,7 +31,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Coupon usage limit exceeded' }, { status: 400 });
     }
 
-    if (coupon.minOrderAmount && (orderAmount === undefined || orderAmount < coupon.minOrderAmount)) {
+    if (
+      coupon.minOrderAmount &&
+      (orderAmount === undefined || orderAmount < coupon.minOrderAmount)
+    ) {
       return NextResponse.json(
         { error: `Minimum order amount of $${coupon.minOrderAmount} required` },
         { status: 400 }

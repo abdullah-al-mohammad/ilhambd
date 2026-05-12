@@ -1,6 +1,6 @@
-import CycloneOffer from '@/models/CycloneOffer';
 import dbConnect from '@/lib/mongodb';
-import { NextResponse } from 'next/server';
+import CycloneOffer from '@/models/CycloneOffer';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   await dbConnect();
@@ -8,7 +8,7 @@ export async function GET() {
   return NextResponse.json(sale || {});
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   await dbConnect();
   const { isActive, endTime } = await req.json();
   const sale = await CycloneOffer.findOneAndUpdate(
