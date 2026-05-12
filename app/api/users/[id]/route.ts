@@ -1,13 +1,13 @@
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
-    const { role } = await request.json();
+    const { role } = await req.json();
 
     if (!role || !['user', 'admin'].includes(role)) {
       return NextResponse.json({ message: 'Invalid role' }, { status: 400 });
@@ -32,17 +32,15 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
     }
 
     await dbConnect();
-    
+
     // Prevent admin from demoting themselves (optional, but safer)
     if (decoded.id === id && role !== 'admin') {
-       // return NextResponse.json({ message: "You cannot demote yourself" }, { status: 400 });
+      // return NextResponse.json({ message: "You cannot demote yourself" }, { status: 400 });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { role },
-      { new: true }
-    ).select('-password');
+    const updatedUser = await User.findByIdAndUpdate(id, { role }, { new: true }).select(
+      '-password'
+    );
 
     if (!updatedUser) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
@@ -51,6 +49,9 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error: any) {
     console.error('PATCH User Error:', error);
-    return NextResponse.json({ message: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { message: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
